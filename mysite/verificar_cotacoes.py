@@ -2,7 +2,6 @@ import time
 from polls.models import Ativo
 from polls.models import Cotacao
 import schedule
-from polls.views import obter_cotacoes
 
 # Dicionário para rastrear o último tempo de verificação de cada ativo
 ultima_verificacao = {}

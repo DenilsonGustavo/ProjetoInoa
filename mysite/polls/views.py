@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .models import Ativo
 from alpha_vantage.timeseries import TimeSeries
+import os
 import pandas as pd
 from django.shortcuts import render
 from io import StringIO
@@ -46,6 +47,7 @@ def ativos(request):
 
 from datetime import datetime
 
+
 def obter_cotacoes(request):
     # Chave de API Alpha Vantage
     api_key = 'XP3TZH661SLV08CX'
@@ -63,10 +65,13 @@ def obter_cotacoes(request):
         lista_tabelas = [df, tabela]
         df = pd.concat(lista_tabelas)
 
-        #display(df)
+    # Exclua todos os dados existentes no modelo Cotacao
+    Cotacao.objects.all().delete()
+
     # Salve o dataframe em um arquivo CSV temporário
     df.to_csv('temp.csv', index=False)
-    # Leia o arquivo CSV e salve os dados no banco de dados em uma única operação
+
+    # Leia o arquivo CSV e salve os novos dados no banco de dados em uma única operação
     with open('temp.csv', 'r') as f:
         reader = csv.reader(f)
         next(reader)  # pule a linha do cabeçalho
@@ -89,8 +94,12 @@ def obter_cotacoes(request):
     for cotacao in cotacoes:
         print(f"Simbolo: {cotacao.simbolo}, Lower price: {cotacao.low_price}, Higher price: {cotacao.high_price}")
 
+    # Exclua o arquivo CSV temporário
+    os.remove('temp.csv')
+
     context = {
         'cotacoes': cotacoes,
     }
 
     return render(request, 'ativos/cotacoes.html', context)
+
