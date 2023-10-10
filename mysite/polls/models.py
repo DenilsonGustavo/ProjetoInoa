@@ -2,9 +2,11 @@ from django.db import models
 
 # Create your models here.
 from django.db import models
+from django.utils import timezone
 
 # Modelo para representar informações sobre ativos financeiros, como ações ou títulos
 class Ativo(models.Model):
+    objects = models.Manager()
     id_ativo = models.AutoField(primary_key=True)
     simbolo = models.CharField(max_length=10)  # Símbolo do ativo, por exemplo, "AAPL" para ações da Apple
     limite_inferior_tunnel = models.DecimalField(max_digits=10, decimal_places=2)  # Limite inferior do túnel de preço do ativo
@@ -13,6 +15,12 @@ class Ativo(models.Model):
 
 # Modelo para representar cotações de preços dos ativos
 class Cotacao(models.Model):
-    ativo = models.ForeignKey(Ativo, on_delete=models.CASCADE)  # Chave estrangeira para o ativo associado à cotação
-    preco = models.DecimalField(max_digits=10, decimal_places=2)  # Preço da cotação
-    data_hora = models.DateTimeField(auto_now_add=True)  # Data e hora em que a cotação foi registrada
+    objects = models.Manager()
+    id_cotacao = models.AutoField(primary_key=True)  # Chave estrangeira para o ativo associado à cotação
+    simbolo = models.CharField(max_length=50)  # Símbolo do ativo (por exemplo, AAPL)
+    low_price = models.DecimalField(max_digits=10, decimal_places=2)  # Preço mínimo
+    high_price = models.DecimalField(max_digits=10, decimal_places=2)  # Preço máximo
+    open_price = models.DecimalField(max_digits=10, decimal_places=2)  # Preço de abertura
+    preco = models.DecimalField(max_digits=10, decimal_places=2)  # Preço de abertura
+
+

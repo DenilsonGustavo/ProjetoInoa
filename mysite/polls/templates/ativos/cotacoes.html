@@ -3,29 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cotações de Ativos</title>
+    <title>Cotações</title>
+    <style>
+        /* Estilos para a tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        /* Estilos para o cabeçalho da tabela */
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        /* Estilos para a mensagem de "Nenhuma cotação disponível" */
+        .no-data {
+            font-style: italic;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
-    <h1>Cotações de Ativos</h1>
+    <h1>Cotações de Empresas</h1>
 
     <table>
         <thead>
             <tr>
-                <th>Ativo</th>
+                <th>Símbolo</th>
+                <th>Preço de Abertura</th>
+                <th>Preço Máximo</th>
+                <th>Preço Mínimo</th>
                 <th>Preço</th>
-                <th>Data e Hora</th>
             </tr>
         </thead>
         <tbody>
             {% for cotacao in cotacoes %}
             <tr>
-                <td>{{ cotacao.ativo }}</td>
-                <td>{{ cotacao.preco }}</td>
-                <td>{{ cotacao.data_hora }}</td>
+                <td>{{ cotacao.simbolo }}</td>
+                <td>${{ cotacao.open_price }}</td>
+                <td>${{ cotacao.high_price }}</td>
+                <td>${{ cotacao.low_price }}</td>
+                <td>${{ cotacao.preco }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="3">Nenhuma cotação disponível.</td>
+                <td colspan="10" class="no-data">Nenhuma cotação disponível.</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Inicial</title>
+    <!-- Link para o Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <nav style="background-color: darkcyan !important;" class="navbar navbar-light bg-light">
+      <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1"></span>
+      </div>
+    </nav>
+    <div class="container mt-5">
+        <h1>Bem-vindo à Página Inicial</h1>
+        <p>Escolha uma das seguintes opções:</p>
+
+        <!-- Grupo de botões alinhados horizontalmente com cores personalizadas e espaçamento -->
+        <div class="btn-group mt-3" role="group">
+            <a href="{% url 'listagem_ativos' %}" class="btn" style="background-color: #05285B; color: #fff;">Ativos Cadastrados</a>
+            <a href="{% url 'exibir_cotacoes' %}" class="btn" style="background-color: #333; color: #fff;">Cotações de Empresas</a>
+            <a href="{% url 'index' %}" class="btn" style="background-color: #1A5FB4; color: #fff;">Cadastrar Ativo</a>
+        </div>
+
+    </div>
+
+    <!-- Scripts JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>
