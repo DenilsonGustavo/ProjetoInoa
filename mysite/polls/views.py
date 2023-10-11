@@ -114,7 +114,7 @@ def enviar_email(subject, message, from_email, recipient_list):
 from .models import EmailEnviado
 def monitorar_emails(request):
     # Exclua todos os dados existentes no modelo Cotacao
-    EmailEnviado.objects.all().delete()
+    #EmailEnviado.objects.all().delete()
     ativos = Ativo.objects.all()
     for ativo in ativos:
         cotacoes = Cotacao.objects.filter(simbolo=ativo.simbolo)
