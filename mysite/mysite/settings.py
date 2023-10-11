@@ -123,6 +123,21 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#tarefas
+#BACKGROUND_TASK_RUN_ASYNC = True
+
+# Celery configuration
+CELERY_BROKER_URL = 'pyamqp://guest@localhost//'  # Substitua pelo URL do RabbitMQ
+CELERY_RESULT_BACKEND = 'rpc://'
+
+# Use JSON como formato de serialização
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# Liste os aplicativos com tarefas do Celery
+CELERY_IMPORTS = ('polls.tasks',)
 #Email
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+

@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from celery import shared_task
 from django.shortcuts import render
 from io import StringIO
 from .models import Cotacao, Ativo
@@ -98,10 +99,11 @@ def obter_cotacoes(request):
     return render(request, 'ativos/cotacoes.html', context)
 
 from .models import EmailEnviado  # Importe o modelo
+from django.core.mail import send_mail
 
 def enviar_email(subject, message, from_email, recipient_list):
     # Envie o email
-
+    send_mail(subject,message,from_email,recipient_list)
     # Após o envio bem-sucedido, salve a mensagem no banco de dados
     mensagem = EmailEnviado(
         assunto=subject,
@@ -138,4 +140,12 @@ def monitorar_emails(request):
 
     return render(request, 'ativos/monitorar_emails.html', context)
 
+from .tasks import atualizar_cotacoes_e_enviar_emails
+from django.http import HttpResponse
+
+def agendar_tarefa(request):
+    # Agende a tarefa para ser executada
+    atualizar_cotacoes_e_enviar_emails.apply_async()
+    # Retorne uma resposta simples
+    return HttpResponse("Tarefa agendada com sucesso!")
 

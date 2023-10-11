@@ -15,4 +15,5 @@ urlpatterns = [
     #path('excluir_ativo/<int:ativo_id>/', views.excluir_ativo, name='excluir_ativo'),
     path('cotacoes/', views.obter_cotacoes, name='exibir_cotacoes'),
     path('monitorar_emails/', views.monitorar_emails, name='monitorar_emails'),
+    path('agendar_tarefa/', views.agendar_tarefa, name='agendar_tarefa'),
 ]

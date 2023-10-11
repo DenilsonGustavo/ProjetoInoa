@@ -28,5 +28,11 @@ class EmailEnviado(models.Model):
     data_envio = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.assunto
-
+class Tarefa(models.Model):
+    objects = models.Manager()
+    titulo = models.CharField(max_length=200)
+    descricao = models.TextField()
+    criada_em = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.title
 
