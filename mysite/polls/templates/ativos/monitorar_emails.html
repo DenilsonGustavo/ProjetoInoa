@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitorar Emails Enviados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        table tbody tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+
+        table tbody tr:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Monitorar Emails Enviados</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Assunto</th>
+                <th>De</th>
+                <th>Para</th>
+                <th>Data de Envio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for email in emails_enviados %}
+            <tr>
+                <td>{{ email.assunto }}</td>
+                <td>{{ email.de }}</td>
+                <td>{{ email.para }}</td>
+                <td>{{ email.mensagem }}</td>
+                <td>{{ email.data_envio }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

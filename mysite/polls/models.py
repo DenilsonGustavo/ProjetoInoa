@@ -1,9 +1,5 @@
 from django.db import models
 
-# Create your models here.
-from django.db import models
-from django.utils import timezone
-
 # Modelo para representar informações sobre ativos financeiros, como ações ou títulos
 class Ativo(models.Model):
     objects = models.Manager()
@@ -22,5 +18,15 @@ class Cotacao(models.Model):
     high_price = models.DecimalField(max_digits=10, decimal_places=2)  # Preço máximo
     open_price = models.DecimalField(max_digits=10, decimal_places=2)  # Preço de abertura
     preco = models.DecimalField(max_digits=10, decimal_places=2)  # Preço de abertura
+
+class EmailEnviado(models.Model):
+    objects = models.Manager()
+    assunto = models.CharField(max_length=255)
+    mensagem = models.TextField()
+    de = models.EmailField()
+    para = models.EmailField()
+    data_envio = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.assunto
 
 

@@ -1,17 +1,10 @@
-from django.shortcuts import render
-from .models import Ativo
-from alpha_vantage.timeseries import TimeSeries
 import os
 import pandas as pd
 from django.shortcuts import render
 from io import StringIO
-from .models import Cotacao
+from .models import Cotacao, Ativo
 import requests
-from django.utils import timezone
-from .utils import buscar_cotacoes  # Importa função criada
 import csv
-from IPython.display import display
-from csv import writer, reader
 
 def index(request):
     return render(request, 'ativos/index.html')
@@ -45,21 +38,22 @@ def ativos(request):
     # Renderize a página de ativos
     return render(request, 'ativos/ativos.html', ativos)
 
-from datetime import datetime
-
-
 def obter_cotacoes(request):
     # Chave de API Alpha Vantage
     api_key = 'XP3TZH661SLV08CX'
 
-    # Lista de símbolos de empresas
-    simbolos_empresas = ['ITUB4', 'ABEV3', 'BBAS3']
+    # Consulta para obter todos os símbolos de Ativo
+    ativos = Ativo.objects.values_list('simbolo', flat=True)
 
+    # Lista de símbolos de empresas
+    #simbolos_empresas = list(ativos)
+    simbolos_empresas = ['ITUB4'] #, 'ABEV3', 'BBAS3'] # 'PETR4', 'VALE3' 'CVCB3', 'PCAR3', 'GOLL4', 'AZUL4', 'MGLU3']
     # Dataframe para armazenar as cotações obtidas
     df = pd.DataFrame()
 
     for simbolo in simbolos_empresas:
         url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={simbolo}.SAO&apikey={api_key}&datatype=csv'
+        #url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={simbolo}&apikey={api_key}&datatype=csv'
         r = requests.get(url)
         tabela = pd.read_csv(StringIO(r.text))
         lista_tabelas = [df, tabela]
@@ -102,4 +96,46 @@ def obter_cotacoes(request):
     }
 
     return render(request, 'ativos/cotacoes.html', context)
+
+from .models import EmailEnviado  # Importe o modelo
+
+def enviar_email(subject, message, from_email, recipient_list):
+    # Envie o email
+
+    # Após o envio bem-sucedido, salve a mensagem no banco de dados
+    mensagem = EmailEnviado(
+        assunto=subject,
+        mensagem=message,
+        de=from_email,
+        para=recipient_list,
+    )
+    mensagem.save()
+
+from .models import EmailEnviado
+def monitorar_emails(request):
+    # Exclua todos os dados existentes no modelo Cotacao
+    #EmailEnviado.objects.all().delete()
+    ativos = Ativo.objects.all()
+    for ativo in ativos:
+        cotacoes = Cotacao.objects.filter(simbolo=ativo.simbolo)
+
+        for cotacao in cotacoes:
+            # Comparar os preços e tomar ação, por exemplo, enviar e-mails
+            if cotacao.preco > ativo.limite_superior_tunnel:
+                mensagem = f'Sugestão de venda para {ativo.simbolo}. Preço atual: {cotacao.preco}'
+                enviar_email('Sugestão de Venda', mensagem, 'seuemail@gmail.com', ['emaildoinvestidor@gmail.com'])
+
+            elif cotacao.preco < ativo.limite_inferior_tunnel:
+                mensagem = f'Sugestão de compra para {ativo.simbolo}. Preço atual: {cotacao.preco}'
+                enviar_email('Sugestão de Compra', mensagem, 'seuemail@gmail.com', ['emaildoinvestidor@gmail.com'])
+
+    # Após enviar os emails, recupere os emails enviados
+    emails_enviados = EmailEnviado.objects.all().order_by('-data_envio')
+    print(emails_enviados)
+    context = {
+        'emails_enviados': emails_enviados,
+    }
+
+    return render(request, 'ativos/monitorar_emails.html', context)
+
 
