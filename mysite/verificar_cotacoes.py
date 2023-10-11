@@ -15,7 +15,7 @@ def enviar_email(subject, message, from_email, recipient_list):
     print(message)
 
 # Função para verificar as condições e enviar e-mails
-def verificar_cotacoes_e_enviar_email():
+def verificar_cotacoes():
     global ultima_verificacao  # Permitir a modificação da variável global
 
     ativos = Ativo.objects.all()  # Obtém todos os ativos
@@ -44,7 +44,7 @@ def verificar_cotacoes_e_enviar_email():
 
 # Agende a verificação com o menor intervalo definido em Ativo.periodicidade_minutos
 menor_intervalo = min(ativo.periodicidade_minutos for ativo in Ativo.objects.all())
-schedule.every(menor_intervalo).minutes.do(verificar_cotacoes_e_enviar_email)
+schedule.every(menor_intervalo).minutes.do(verificar_cotacoes)
 
 # Mantenha o script em execução
 while True:
