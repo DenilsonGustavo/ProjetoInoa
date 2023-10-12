@@ -1,12 +1,12 @@
-import os
-import pandas as pd
-from celery import shared_task
 from django.shortcuts import render
 from io import StringIO
 from .models import Cotacao, Ativo
+import os
+import pandas as pd
 import requests
 import csv
-
+from datetime import datetime, timedelta
+from django.utils import timezone
 def index(request):
     return render(request, 'ativos/index.html')
 
@@ -39,29 +39,37 @@ def ativos(request):
     # Renderize a página de ativos
     return render(request, 'ativos/ativos.html', ativos)
 
+
 def obter_cotacoes(request):
     # Chave de API Alpha Vantage
     api_key = 'XP3TZH661SLV08CX'
 
     # Consulta para obter todos os símbolos de Ativo
-    ativos = Ativo.objects.values_list('simbolo', flat=True)
-
+    ativos = Ativo.objects.all()
+    hora_atual = timezone.now()
     # Lista de símbolos de empresas
-    #simbolos_empresas = list(ativos)
-    simbolos_empresas = ['ITUB4'] #, 'ABEV3', 'BBAS3'] # 'PETR4', 'VALE3' 'CVCB3', 'PCAR3', 'GOLL4', 'AZUL4', 'MGLU3']
+    simbolos_empresas = [ativo.simbolo for ativo in ativos]
+
+    # Lista para armazenar os símbolos que foram alterados
+    simbolos_alterados = []
+
     # Dataframe para armazenar as cotações obtidas
     df = pd.DataFrame()
 
     for simbolo in simbolos_empresas:
-        url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={simbolo}.SAO&apikey={api_key}&datatype=csv'
-        #url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={simbolo}&apikey={api_key}&datatype=csv'
-        r = requests.get(url)
-        tabela = pd.read_csv(StringIO(r.text))
-        lista_tabelas = [df, tabela]
-        df = pd.concat(lista_tabelas)
+        ativo = Ativo.objects.get(simbolo=simbolo)
+        # Verifique se a última hora de checagem é nula (primeira vez) ou se o tempo de checagem foi ultrapassado
+        if ativo.ultimo_horario_checagem is None or (hora_atual - ativo.ultimo_horario_checagem) >= timedelta(
+                minutes=ativo.periodicidade_minutos):
+            url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={simbolo}&apikey={api_key}&datatype=csv'
+            r = requests.get(url)
+            tabela = pd.read_csv(StringIO(r.text))
+            lista_tabelas = [df, tabela]
+            df = pd.concat(lista_tabelas)
+            simbolos_alterados.append(simbolo)
 
-    # Exclua todos os dados existentes no modelo Cotacao
-    Cotacao.objects.all().delete()
+    # Exclua as cotações existentes que têm os mesmos símbolos dos novos dados
+    Cotacao.objects.filter(simbolo__in=simbolos_alterados).delete()
 
     # Salve o dataframe em um arquivo CSV temporário
     df.to_csv('temp.csv', index=False)
@@ -82,6 +90,10 @@ def obter_cotacoes(request):
             # Salve a instância no banco de dados
             cotacao.save()
 
+    # Atualize a última hora de checagem dos ativos
+    for simbolo in simbolos_empresas:
+        Ativo.objects.filter(simbolo=simbolo).update(ultimo_horario_checagem=hora_atual)
+
     # Recupere todas as cotações do banco de dados
     cotacoes = Cotacao.objects.all()
 
@@ -97,6 +109,7 @@ def obter_cotacoes(request):
     }
 
     return render(request, 'ativos/cotacoes.html', context)
+
 
 from .models import EmailEnviado  # Importe o modelo
 from django.core.mail import send_mail

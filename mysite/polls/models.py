@@ -4,10 +4,13 @@ from django.db import models
 class Ativo(models.Model):
     objects = models.Manager()
     id_ativo = models.AutoField(primary_key=True)
-    simbolo = models.CharField(max_length=10)  # Símbolo do ativo, por exemplo, "AAPL" para ações da Apple
-    limite_inferior_tunnel = models.DecimalField(max_digits=10, decimal_places=2)  # Limite inferior do túnel de preço do ativo
-    limite_superior_tunnel = models.DecimalField(max_digits=10, decimal_places=2)  # Limite superior do túnel de preço do ativo
-    periodicidade_minutos = models.IntegerField()  # Periodicidade em minutos para monitorar o ativo
+    simbolo = models.CharField(max_length=10)
+    limite_inferior_tunnel = models.DecimalField(max_digits=10, decimal_places=2)
+    limite_superior_tunnel = models.DecimalField(max_digits=10, decimal_places=2)
+    periodicidade_minutos = models.IntegerField()
+    ultimo_horario_checagem = models.DateTimeField(null=True, blank=True)
+    def __str__(self):
+        return self.simbolo
 
 # Modelo para representar cotações de preços dos ativos
 class Cotacao(models.Model):
